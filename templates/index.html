@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="app-title">Pomodoro Timer</h1>
+            <p class="app-subtitle">Stay focused and productive</p>
+        </header>
+        
+        <main class="timer-container">
+            <!-- Timer Display Section -->
+            <section class="timer-display-section">
+                <div class="progress-ring">
+                    <svg class="progress-ring-svg" width="280" height="280">
+                        <circle
+                            class="progress-ring-circle-bg"
+                            stroke="#e5e7eb"
+                            stroke-width="8"
+                            cx="140"
+                            cy="140"
+                            r="120"
+                            fill="transparent"
+                        />
+                        <circle
+                            class="progress-ring-circle"
+                            stroke="#3b82f6"
+                            stroke-width="8"
+                            stroke-linecap="round"
+                            cx="140"
+                            cy="140"
+                            r="120"
+                            fill="transparent"
+                            stroke-dasharray="753.98"
+                            stroke-dashoffset="753.98"
+                        />
+                    </svg>
+                    <div class="timer-display">
+                        <span id="timer-minutes">25</span>:<span id="timer-seconds">00</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Session Information -->
+            <section class="session-info">
+                <div class="session-type">
+                    <span id="session-type-text">Work Session</span>
+                </div>
+                <div class="session-counter">
+                    <span>Session <span id="current-session">1</span> of ∞</span>
+                </div>
+            </section>
+            
+            <!-- Control Buttons -->
+            <section class="controls">
+                <button id="start-stop-btn" class="btn btn-primary" aria-label="Start timer">
+                    <span class="btn-text">Start</span>
+                </button>
+                <button id="reset-btn" class="btn btn-secondary" aria-label="Reset timer">
+                    <span class="btn-text">Reset</span>
+                </button>
+                <button id="skip-btn" class="btn btn-secondary" aria-label="Skip session">
+                    <span class="btn-text">Skip</span>
+                </button>
+            </section>
+            
+            <!-- Settings Panel (initially hidden) -->
+            <section class="settings-panel" id="settings-panel">
+                <h3>Timer Settings</h3>
+                <div class="setting-group">
+                    <label for="work-duration">Work Duration (minutes):</label>
+                    <input type="number" id="work-duration" min="1" max="60" value="25">
+                </div>
+                <div class="setting-group">
+                    <label for="break-duration">Break Duration (minutes):</label>
+                    <input type="number" id="break-duration" min="1" max="30" value="5">
+                </div>
+                <div class="settings-actions">
+                    <button id="save-settings-btn" class="btn btn-primary">Save</button>
+                    <button id="cancel-settings-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Settings Toggle Button -->
+        <button id="settings-toggle-btn" class="settings-toggle" aria-label="Open settings">
+            ⚙️
+        </button>
+    </div>
+    
+    <!-- Loading State Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
+    
+    <!-- Notification Area -->
+    <div id="notification-area" class="notification-area"></div>
+    
+    <!-- Socket.IO Script -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="{{ url_for('static', filename='js/timer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

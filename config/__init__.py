@@ -1,0 +1,1 @@
+"""Configuration package for Pomodoro Timer application."""

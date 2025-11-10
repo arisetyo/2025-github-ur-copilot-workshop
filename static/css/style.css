@@ -1,0 +1,574 @@
+/* Pomodoro Timer - Main Stylesheet */
+
+/* CSS Variables for theming */
+:root {
+    /* Work Session Colors */
+    --work-primary: #2563eb;
+    --work-secondary: #dbeafe;
+    --work-accent: #1d4ed8;
+    
+    /* Break Session Colors */
+    --break-primary: #16a34a;
+    --break-secondary: #dcfce7;
+    --break-accent: #15803d;
+    
+    /* Neutral Colors */
+    --neutral-gray: #6b7280;
+    --neutral-light: #f3f4f6;
+    --neutral-dark: #1f2937;
+    --neutral-white: #ffffff;
+    
+    /* Alert Colors */
+    --alert-color: #ea580c;
+    --error-color: #dc2626;
+    --success-color: #059669;
+    
+    /* Typography */
+    --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-family-mono: 'JetBrains Mono', 'Consolas', monospace;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --border-radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --transition-fast: 150ms ease-in-out;
+    --transition-normal: 300ms ease-in-out;
+    --transition-slow: 500ms ease-in-out;
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-family-sans);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neutral-dark);
+    line-height: 1.6;
+    transition: background var(--transition-slow);
+}
+
+/* Work Session Theme */
+body.work-session {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Break Session Theme */
+body.break-session {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+/* Container */
+.container {
+    max-width: 28rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    position: relative;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.app-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--neutral-white);
+    margin-bottom: var(--spacing-sm);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 400;
+}
+
+/* Timer Container */
+.timer-container {
+    background: var(--neutral-white);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    transition: all var(--transition-normal);
+}
+
+/* Timer Display Section */
+.timer-display-section {
+    margin-bottom: var(--spacing-2xl);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-ring {
+    position: relative;
+    display: inline-block;
+}
+
+.progress-ring-svg {
+    transform: rotate(-90deg);
+    transition: all var(--transition-normal);
+}
+
+.progress-ring-circle-bg {
+    transition: stroke var(--transition-normal);
+}
+
+.progress-ring-circle {
+    transition: stroke var(--transition-normal), stroke-dashoffset var(--transition-fast);
+    transform-origin: center;
+}
+
+.timer-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-family-mono);
+    font-size: 3rem;
+    font-weight: 600;
+    color: var(--neutral-dark);
+    letter-spacing: -0.05em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#timer-minutes,
+#timer-seconds {
+    display: inline-block;
+    min-width: 1.5ch;
+}
+
+/* Session Information */
+.session-info {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.session-type {
+    margin-bottom: var(--spacing-md);
+}
+
+#session-type-text {
+    display: inline-block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--work-primary);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--work-secondary);
+    border-radius: var(--border-radius-full);
+    transition: all var(--transition-normal);
+}
+
+.session-counter {
+    font-size: 0.875rem;
+    color: var(--neutral-gray);
+    font-weight: 500;
+}
+
+#current-session {
+    font-weight: 600;
+    color: var(--neutral-dark);
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    font-family: var(--font-family-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 6rem;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-primary {
+    background: var(--work-primary);
+    color: var(--neutral-white);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--work-accent);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background: var(--neutral-light);
+    color: var(--neutral-gray);
+    border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #e5e7eb;
+    color: var(--neutral-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Settings Panel */
+.settings-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--neutral-white);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
+    margin-top: var(--spacing-md);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all var(--transition-normal);
+    z-index: 10;
+}
+
+.settings-panel.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.settings-panel h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    color: var(--neutral-dark);
+}
+
+.setting-group {
+    margin-bottom: var(--spacing-lg);
+    text-align: left;
+}
+
+.setting-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--neutral-gray);
+    margin-bottom: var(--spacing-sm);
+}
+
+.setting-group input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid #d1d5db;
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    transition: border-color var(--transition-fast);
+}
+
+.setting-group input:focus {
+    outline: none;
+    border-color: var(--work-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.settings-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-lg);
+}
+
+/* Settings Toggle Button */
+.settings-toggle {
+    position: absolute;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: var(--border-radius-full);
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: var(--neutral-white);
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(10px);
+}
+
+.settings-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.loading-overlay.hidden {
+    display: none;
+}
+
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid var(--neutral-white);
+    border-radius: var(--border-radius-full);
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--spacing-md);
+}
+
+.loading-overlay p {
+    color: var(--neutral-white);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Notification Area */
+.notification-area {
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    z-index: 1000;
+    max-width: 20rem;
+}
+
+.notification {
+    background: var(--neutral-white);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(100%);
+    opacity: 0;
+    animation: slideIn var(--transition-normal) forwards;
+}
+
+.notification.success {
+    border-left: 4px solid var(--success-color);
+}
+
+.notification.error {
+    border-left: 4px solid var(--error-color);
+}
+
+.notification.warning {
+    border-left: 4px solid var(--alert-color);
+}
+
+@keyframes slideIn {
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Break Session Specific Styles */
+.break-session .progress-ring-circle {
+    stroke: var(--break-primary);
+}
+
+.break-session #session-type-text {
+    color: var(--break-primary);
+    background: var(--break-secondary);
+}
+
+.break-session .btn-primary {
+    background: var(--break-primary);
+}
+
+.break-session .btn-primary:hover:not(:disabled) {
+    background: var(--break-accent);
+}
+
+/* Accessibility and Focus Styles */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .container {
+        padding: var(--spacing-md);
+        max-width: 100%;
+    }
+    
+    .app-title {
+        font-size: 1.5rem;
+    }
+    
+    .timer-container {
+        padding: var(--spacing-lg);
+    }
+    
+    .progress-ring-svg {
+        width: 240px;
+        height: 240px;
+    }
+    
+    .progress-ring-circle,
+    .progress-ring-circle-bg {
+        cx: 120;
+        cy: 120;
+        r: 100;
+    }
+    
+    .timer-display {
+        font-size: 2.5rem;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 12rem;
+    }
+    
+    .settings-toggle {
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+    
+    .notification-area {
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+        left: var(--spacing-sm);
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-ring-svg {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .progress-ring-circle,
+    .progress-ring-circle-bg {
+        cx: 100;
+        cy: 100;
+        r: 80;
+    }
+    
+    .timer-display {
+        font-size: 2rem;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --work-primary: #1e40af;
+        --break-primary: #166534;
+        --neutral-gray: #374151;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .progress-ring-circle {
+        transition: none;
+    }
+}
+
+/* Dark mode support (for future implementation) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --neutral-white: #1f2937;
+        --neutral-dark: #f9fafb;
+        --neutral-light: #374151;
+        --neutral-gray: #9ca3af;
+    }
+}
