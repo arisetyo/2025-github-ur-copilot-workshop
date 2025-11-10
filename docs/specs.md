@@ -202,10 +202,10 @@ A single-page web application with real-time timer functionality, session manage
 - **Web APIs**: Notifications API, Audio API
 
 ### 4.2 Backend Technology Stack
-- **FastAPI**: RESTful API and WebSocket support
+- **Flask**: Lightweight web framework for RESTful API
 - **Python 3.9+**: Backend programming language
-- **Pydantic**: Data validation and modeling
-- **uvicorn**: ASGI server for development
+- **Flask-SocketIO**: Real-time communication support
+- **Gunicorn**: WSGI server for development and production
 
 ### 4.3 API Endpoints
 
@@ -218,9 +218,12 @@ POST   /api/timer/reset      # Reset timer
 POST   /api/timer/skip       # Skip to next session
 ```
 
-#### 4.3.2 WebSocket API
+#### 4.3.2 Socket.IO Events
 ```
-WS     /ws/timer            # Real-time timer updates
+timer_update         # Real-time timer state updates
+session_complete     # Session completion notifications
+connect             # Client connection event
+disconnect          # Client disconnection event
 ```
 
 ### 4.4 Data Models
@@ -315,8 +318,8 @@ WS     /ws/timer            # Real-time timer updates
 - ✅ Consistent performance across browsers and devices
 
 ### 7.3 Technical Requirements
-- ✅ FastAPI backend with RESTful API
-- ✅ Real-time updates via WebSocket
+- ✅ Flask backend with RESTful API
+- ✅ Real-time updates via Socket.IO
 - ✅ Responsive CSS design
 - ✅ Vanilla JavaScript implementation
 - ✅ Cross-browser compatibility

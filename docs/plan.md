@@ -2,17 +2,17 @@
 
 ## Implementation Overview
 
-This document outlines a granular, step-by-step plan for implementing the Pomodoro timer web application using FastAPI and HTML/CSS/JavaScript. The plan is structured to maximize learning opportunities with GitHub Copilot while building incrementally.
+This document outlines a granular, step-by-Step plan for implementing the Pomodoro timer web application using Flask and HTML/CSS/JavaScript. The plan is structured to maximize learning opportunities with GitHub Copilot while building incrementally.
 
 ## Necessary Functions to Implement
 
-### Backend Functions (FastAPI)
+### Backend Functions (Flask)
 
 #### Data Models & Types
 - `SessionType` enum (work, break)
 - `TimerStatus` enum (running, paused, stopped)
-- `TimerState` class with validation
-- `PomodoroSession` configuration class
+- `TimerState` dataclass with validation
+- `PomodoroSession` configuration dataclass
 
 #### Timer Service Functions
 - `create_timer_state()` - Initialize new timer state
@@ -25,21 +25,21 @@ This document outlines a granular, step-by-step plan for implementing the Pomodo
 - `calculate_progress()` - Calculate completion percentage
 - `is_session_complete()` - Check if timer reached 00:00
 
-#### API Endpoint Functions
-- `get_timer_status_endpoint()` - GET /api/timer/status
-- `start_timer_endpoint()` - POST /api/timer/start
-- `pause_timer_endpoint()` - POST /api/timer/pause
-- `reset_timer_endpoint()` - POST /api/timer/reset
-- `skip_session_endpoint()` - POST /api/timer/skip
+#### API Route Functions
+- `get_timer_status_route()` - GET /api/timer/status
+- `start_timer_route()` - POST /api/timer/start
+- `pause_timer_route()` - POST /api/timer/pause
+- `reset_timer_route()` - POST /api/timer/reset
+- `skip_session_route()` - POST /api/timer/skip
 
-#### WebSocket Functions
-- `websocket_endpoint()` - Handle WebSocket connections
-- `broadcast_timer_update()` - Send updates to connected clients
-- `handle_client_connection()` - Manage client connections
-- `handle_client_disconnection()` - Clean up disconnected clients
+#### Socket.IO Functions
+- `handle_connect()` - Handle client connections
+- `handle_disconnect()` - Handle client disconnections
+- `emit_timer_update()` - Send timer updates to all clients
+- `emit_session_complete()` - Send session completion notifications
 
 #### Background Task Functions
-- `timer_background_task()` - Main timer loop
+- `timer_background_thread()` - Main timer loop in separate thread
 - `schedule_timer_updates()` - Regular update scheduler
 - `handle_session_completion()` - Process session transitions
 
@@ -61,12 +61,12 @@ This document outlines a granular, step-by-step plan for implementing the Pomodo
 - `updateSessionCounter()` - Update completed sessions count
 - `toggleSessionStyle()` - Switch between work/break styling
 
-#### WebSocket Communication Functions
-- `connectWebSocket()` - Establish WebSocket connection
-- `handleWebSocketMessage()` - Process incoming messages
-- `handleWebSocketError()` - Handle connection errors
-- `handleWebSocketClose()` - Handle connection closure
-- `reconnectWebSocket()` - Reconnect on failure
+#### Socket.IO Communication Functions
+- `connectSocket()` - Establish Socket.IO connection
+- `handleSocketMessage()` - Process incoming events
+- `handleSocketError()` - Handle connection errors
+- `handleSocketDisconnect()` - Handle connection closure
+- `setupSocketListeners()` - Set up event listeners
 
 #### Notification Functions
 - `requestNotificationPermission()` - Ask for browser notifications
@@ -97,43 +97,46 @@ This document outlines a granular, step-by-step plan for implementing the Pomodo
 #### Step 1: Project Structure Setup
 **Objective**: Create basic project structure and environment
 **Files to Create**:
-- Create directory structure (`backend/`, `frontend/`, `tests/`)
+- Create directory structure (`models/`, `routes/`, `services/`, `static/`, `templates/`, `tests/`)
 - Set up virtual environment with `uv`
-- Create `requirements.txt` with FastAPI dependencies
+- Create `requirements.txt` with Flask dependencies
 - Initialize `__init__.py` files
+- Create main `app.py` file
 
 **Expected Outcome**: Clean project structure ready for development
 
-#### Step 2: Basic FastAPI Server
-**Objective**: Set up working FastAPI server
+#### Step 2: Basic Flask Server
+**Objective**: Set up working Flask server
 **Files to Create/Modify**:
-- `backend/main.py` - Basic FastAPI app with health check
-- `backend/config/settings.py` - Basic configuration
+- `app.py` - Basic Flask app with health check
+- `config/settings.py` - Basic configuration
 
 **Functions to Implement**:
 ```python
-# main.py
-def create_app() -> FastAPI
+# app.py
+def create_app() -> Flask
 def health_check() -> dict
 ```
 
-**Expected Outcome**: Running FastAPI server on localhost:8000
+**Expected Outcome**: Running Flask server on localhost:5000
 
 #### Step 3: Data Models
 **Objective**: Define core data structures
 **Files to Create**:
-- `backend/models/timer.py` - Timer state models
-- `backend/models/session.py` - Session configuration models
+- `models/timer.py` - Timer state models
+- `models/session.py` - Session configuration models
 
 **Functions to Implement**:
 ```python
 # timer.py
 class SessionType(Enum)
 class TimerStatus(Enum)
-class TimerState(BaseModel)
+@dataclass
+class TimerState
 
 # session.py
-class PomodoroSession(BaseModel)
+@dataclass
+class PomodoroSession
 ```
 
 **Expected Outcome**: Well-defined data models with validation
@@ -141,29 +144,30 @@ class PomodoroSession(BaseModel)
 #### Step 4: Basic HTML Template
 **Objective**: Create foundation HTML structure
 **Files to Create**:
-- `frontend/templates/index.html` - Basic HTML structure
-- `frontend/static/css/style.css` - Basic CSS styling
+- `templates/index.html` - Basic HTML structure
+- `static/css/style.css` - Basic CSS styling
 
 **Expected Outcome**: Simple HTML page with timer layout
 
 #### Step 5: Static File Serving
-**Objective**: Serve HTML/CSS/JS from FastAPI
+**Objective**: Serve HTML/CSS/JS from Flask
 **Files to Modify**:
-- `backend/main.py` - Add static file mounting
+- `app.py` - Add static file serving and template rendering
 
 **Functions to Implement**:
 ```python
-def setup_static_files(app: FastAPI)
+def setup_static_files(app: Flask)
+def index() -> str  # Route to serve main page
 ```
 
-**Expected Outcome**: HTML page served from FastAPI server
+**Expected Outcome**: HTML page served from Flask server
 
 ### Phase 2: Core Timer Logic (Steps 6-10)
 
 #### Step 6: Timer Service Foundation
 **Objective**: Create core timer business logic
 **Files to Create**:
-- `backend/services/timer_service.py` - Core timer operations
+- `services/timer_service.py` - Core timer operations
 
 **Functions to Implement**:
 ```python
@@ -179,7 +183,7 @@ class TimerService:
 #### Step 7: Timer REST API Endpoints
 **Objective**: Create API endpoints for timer operations
 **Files to Create**:
-- `backend/routers/timer.py` - Timer API endpoints
+- `routes/timer.py` - Timer API routes
 
 **Functions to Implement**:
 ```python
@@ -194,8 +198,8 @@ def reset_timer() -> TimerState
 #### Step 8: Frontend Timer JavaScript
 **Objective**: Create client-side timer logic
 **Files to Create**:
-- `frontend/static/js/app.js` - Main application logic
-- `frontend/static/js/timer.js` - Timer-specific functions
+- `static/js/app.js` - Main application logic
+- `static/js/timer.js` - Timer-specific functions
 
 **Functions to Implement**:
 ```javascript
@@ -216,8 +220,8 @@ function formatTime(seconds)
 #### Step 9: Timer Display Updates
 **Objective**: Real-time timer display updates
 **Files to Modify**:
-- `frontend/static/js/timer.js` - Add display update logic
-- `frontend/static/css/style.css` - Timer display styling
+- `static/js/timer.js` - Add display update logic
+- `static/css/style.css` - Timer display styling
 
 **Functions to Implement**:
 ```javascript
@@ -231,8 +235,8 @@ setInterval(updateDisplay, 1000)
 #### Step 10: Session Management
 **Objective**: Handle work/break session transitions
 **Files to Modify**:
-- `backend/services/timer_service.py` - Add session logic
-- `frontend/static/js/timer.js` - Add session handling
+- `services/timer_service.py` - Add session logic
+- `static/js/timer.js` - Add session handling
 
 **Functions to Implement**:
 ```python
@@ -249,35 +253,33 @@ function updateSessionInfo()
 
 ### Phase 3: Real-time Features (Steps 11-15)
 
-#### Step 11: WebSocket Backend
+#### Step 11: Socket.IO Backend
 **Objective**: Implement real-time communication
 **Files to Modify**:
-- `backend/main.py` - Add WebSocket endpoint
-- `backend/services/timer_service.py` - Add WebSocket broadcasting
+- `app.py` - Add Flask-SocketIO setup
+- `services/timer_service.py` - Add Socket.IO broadcasting
 
 **Functions to Implement**:
 ```python
-async def websocket_endpoint(websocket: WebSocket)
-async def broadcast_timer_update(state: TimerState)
-class ConnectionManager:
-    def connect(websocket)
-    def disconnect(websocket)
-    def broadcast(message)
+def handle_connect()
+def handle_disconnect()
+def emit_timer_update(state: TimerState)
+def emit_session_complete()
 ```
 
-**Expected Outcome**: WebSocket server broadcasting timer updates
+**Expected Outcome**: Socket.IO server broadcasting timer updates
 
-#### Step 12: WebSocket Frontend
+#### Step 12: Socket.IO Frontend
 **Objective**: Connect frontend to real-time updates
 **Files to Create**:
-- `frontend/static/js/websocket.js` - WebSocket client logic
+- `static/js/socket.js` - Socket.IO client logic
 
 **Functions to Implement**:
 ```javascript
-function connectWebSocket()
-function handleWebSocketMessage(event)
-function handleWebSocketError(event)
-function reconnectWebSocket()
+function connectSocket()
+function handleTimerUpdate(data)
+function handleSessionComplete(data)
+function setupSocketListeners()
 ```
 
 **Expected Outcome**: Real-time timer synchronization
@@ -285,12 +287,12 @@ function reconnectWebSocket()
 #### Step 13: Background Timer Task
 **Objective**: Server-side timer countdown
 **Files to Modify**:
-- `backend/services/timer_service.py` - Add background task
+- `services/timer_service.py` - Add background thread
 
 **Functions to Implement**:
 ```python
-async def timer_background_task()
-async def update_timer_tick()
+def timer_background_thread()
+def update_timer_tick()
 def start_background_timer()
 def stop_background_timer()
 ```
@@ -300,8 +302,8 @@ def stop_background_timer()
 #### Step 14: Progress Indicator
 **Objective**: Visual progress representation
 **Files to Modify**:
-- `frontend/static/css/style.css` - Progress bar styling
-- `frontend/static/js/timer.js` - Progress calculation
+- `static/css/style.css` - Progress bar styling
+- `static/js/timer.js` - Progress calculation
 
 **Functions to Implement**:
 ```javascript
@@ -321,8 +323,8 @@ function calculateProgress(currentTime, totalTime)
 #### Step 15: Session Type Styling
 **Objective**: Different visual themes for work/break
 **Files to Modify**:
-- `frontend/static/css/style.css` - Session-specific styling
-- `frontend/static/js/timer.js` - Style switching logic
+- `static/css/style.css` - Session-specific styling
+- `static/js/timer.js` - Style switching logic
 
 **Functions to Implement**:
 ```javascript
@@ -344,8 +346,8 @@ function getSessionTheme(sessionType)
 #### Step 16: Audio Notifications
 **Objective**: Sound alerts for session transitions
 **Files to Create**:
-- `frontend/static/js/notifications.js` - Notification handling
-- Add audio files to `frontend/static/assets/sounds/`
+- `static/js/notifications.js` - Notification handling
+- Add audio files to `static/assets/sounds/`
 
 **Functions to Implement**:
 ```javascript
@@ -359,7 +361,7 @@ function setVolume(level)
 #### Step 17: Browser Notifications
 **Objective**: Desktop notifications for session changes
 **Files to Modify**:
-- `frontend/static/js/notifications.js` - Add browser notifications
+- `static/js/notifications.js` - Add browser notifications
 
 **Functions to Implement**:
 ```javascript
@@ -373,8 +375,8 @@ function checkNotificationSupport()
 #### Step 18: Responsive Design
 **Objective**: Mobile-friendly interface
 **Files to Modify**:
-- `frontend/static/css/style.css` - Responsive styling
-- Add `frontend/static/css/responsive.css`
+- `static/css/style.css` - Responsive styling
+- Add `static/css/responsive.css`
 
 **CSS Features to Implement**:
 ```css
@@ -389,7 +391,7 @@ function checkNotificationSupport()
 #### Step 19: Keyboard Shortcuts
 **Objective**: Keyboard accessibility
 **Files to Modify**:
-- `frontend/static/js/app.js` - Keyboard event handling
+- `static/js/app.js` - Keyboard event handling
 
 **Functions to Implement**:
 ```javascript
@@ -404,8 +406,8 @@ function resetTimer() // 'R' key
 #### Step 20: Session Counter & Statistics
 **Objective**: Track completed sessions
 **Files to Modify**:
-- `backend/services/timer_service.py` - Session tracking
-- `frontend/static/js/timer.js` - Counter display
+- `services/timer_service.py` - Session tracking
+- `static/js/timer.js` - Counter display
 
 **Functions to Implement**:
 ```python
@@ -443,8 +445,8 @@ def log_error(error)
 #### Step 22: Loading States
 **Objective**: User feedback during operations
 **Files to Modify**:
-- `frontend/static/js/app.js` - Loading indicators
-- `frontend/static/css/style.css` - Loading animations
+- `static/js/app.js` - Loading indicators
+- `static/css/style.css` - Loading animations
 
 **Functions to Implement**:
 ```javascript
@@ -459,8 +461,8 @@ function enableButtons()
 #### Step 23: Configuration Options
 **Objective**: Customizable timer durations
 **Files to Modify**:
-- `backend/routers/timer.py` - Configuration endpoints
-- `frontend/templates/index.html` - Settings UI
+- `routes/timer.py` - Configuration endpoints
+- `templates/index.html` - Settings UI
 
 **Functions to Implement**:
 ```python

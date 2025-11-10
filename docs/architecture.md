@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the architecture for a simple Pomodoro timer web application built using FastAPI for the backend and HTML/CSS/JavaScript for the frontend. The application is designed to be educational, demonstrating GitHub Copilot capabilities while providing a functional productivity tool.
+This document outlines the architecture for a simple Pomodoro timer web application built using Flask for the backend and HTML/CSS/JavaScript for the frontend. The application is designed to be educational, demonstrating GitHub Copilot capabilities while providing a functional productivity tool.
 
 ## Project Goals
 
@@ -15,10 +15,10 @@ This document outlines the architecture for a simple Pomodoro timer web applicat
 ## Technology Stack
 
 ### Backend
-- **FastAPI**: Modern, fast web framework for building APIs
+- **Flask**: Lightweight, flexible web framework for building APIs
 - **Python**: Primary programming language
-- **Pydantic**: Data validation and settings management
-- **asyncio**: Asynchronous programming for timer operations
+- **Flask-SocketIO**: WebSocket support for real-time communication
+- **threading**: Multi-threading for timer operations
 - **SQLite**: Optional lightweight database for persistence
 - **uv**: Modern Python package manager
 
@@ -26,7 +26,7 @@ This document outlines the architecture for a simple Pomodoro timer web applicat
 - **HTML5**: Semantic markup structure
 - **CSS3**: Styling with Grid/Flexbox layouts
 - **Vanilla JavaScript**: Client-side logic and interactions
-- **WebSocket/Server-Sent Events**: Real-time communication
+- **Socket.IO**: Real-time communication with Flask-SocketIO
 - **Web APIs**: Notifications, Audio, LocalStorage
 
 ## System Architecture
@@ -38,35 +38,33 @@ project-root/
 ├── README.md
 ├── docs/
 │   └── architecture.md
-├── backend/
-│   ├── main.py                 # FastAPI application entry point
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── timer.py           # Timer data models
-│   │   └── session.py         # Pomodoro session models
-│   ├── routers/
-│   │   ├── __init__.py
-│   │   └── timer.py           # Timer API endpoints
-│   ├── services/
-│   │   ├── __init__.py
-│   │   └── timer_service.py   # Business logic for timer operations
-│   └── config/
-│       ├── __init__.py
-│       └── settings.py        # Application configuration
-├── frontend/
-│   ├── static/
-│   │   ├── css/
-│   │   │   ├── style.css      # Main stylesheet
-│   │   │   └── components.css # Component-specific styles
-│   │   ├── js/
-│   │   │   ├── app.js         # Main application logic
-│   │   │   ├── timer.js       # Timer-specific functionality
-│   │   │   └── notifications.js # Notification handling
-│   │   └── assets/
-│   │       ├── sounds/
-│   │       └── images/
-│   └── templates/
-│       └── index.html         # Main HTML template
+├── app.py                      # Flask application entry point
+├── models/
+│   ├── __init__.py
+│   ├── timer.py               # Timer data models
+│   └── session.py             # Pomodoro session models
+├── routes/
+│   ├── __init__.py
+│   └── timer.py               # Timer API routes
+├── services/
+│   ├── __init__.py
+│   └── timer_service.py       # Business logic for timer operations
+├── config/
+│   ├── __init__.py
+│   └── settings.py            # Application configuration
+├── static/
+│   ├── css/
+│   │   ├── style.css          # Main stylesheet
+│   │   └── components.css     # Component-specific styles
+│   ├── js/
+│   │   ├── app.js             # Main application logic
+│   │   ├── timer.js           # Timer-specific functionality
+│   │   └── notifications.js   # Notification handling
+│   └── assets/
+│       ├── sounds/
+│       └── images/
+├── templates/
+│   └── index.html             # Main HTML template
 ├── tests/
 │   ├── test_timer_service.py
 │   └── test_api.py
@@ -81,36 +79,48 @@ project-root/
 
 **Timer Model** (`timer.py`):
 ```python
-class TimerState(BaseModel):
+from dataclasses import dataclass
+from enum import Enum
+
+class SessionType(Enum):
+    WORK = "work"
+    BREAK = "break"
+
+class TimerStatus(Enum):
+    RUNNING = "running"
+    PAUSED = "paused"
+    STOPPED = "stopped"
+
+@dataclass
+class TimerState:
     current_time: int           # Seconds remaining
-    session_type: SessionType   # work/short_break/long_break
+    session_type: SessionType   # work/break
     status: TimerStatus         # running/paused/stopped
     session_count: int          # Number of completed work sessions
-    total_sessions: int         # Target sessions before long break
 ```
 
 **Session Model** (`session.py`):
 ```python
-class PomodoroSession(BaseModel):
+@dataclass
+class PomodoroSession:
     work_duration: int = 1500      # 25 minutes in seconds
-    short_break_duration: int = 300 # 5 minutes in seconds
-    long_break_duration: int = 900  # 15 minutes in seconds
-    sessions_until_long_break: int = 4
+    break_duration: int = 300      # 5 minutes in seconds
 ```
 
-#### 2. API Endpoints (`routers/timer.py`)
+#### 2. API Routes (`routes/timer.py`)
 
-**REST API Endpoints**:
+**REST API Routes**:
 - `GET /api/timer/status` - Get current timer state
 - `POST /api/timer/start` - Start the timer
 - `POST /api/timer/pause` - Pause the timer
 - `POST /api/timer/reset` - Reset the timer
-- `POST /api/timer/next-session` - Move to next session type
+- `POST /api/timer/skip` - Skip to next session type
 - `GET /api/timer/config` - Get timer configuration
 - `PUT /api/timer/config` - Update timer configuration
 
-**WebSocket Endpoint**:
-- `WS /ws/timer` - Real-time timer updates
+**Socket.IO Events**:
+- `timer_update` - Real-time timer state updates
+- `session_complete` - Session completion notifications
 
 #### 3. Business Logic (`services/timer_service.py`)
 
@@ -129,9 +139,10 @@ class PomodoroSession(BaseModel):
 - Stateless operations
 
 #### Real-time Communication
-- WebSocket connections for live timer updates
-- Server-sent events as fallback
-- Efficient message broadcasting
+- Socket.IO for bidirectional real-time communication
+- Event-based messaging system
+- Automatic reconnection handling
+- Room-based broadcasting for multiple clients
 
 ## Frontend Architecture
 
@@ -165,11 +176,11 @@ class PomodoroSession(BaseModel):
 - **app.js**: Main application controller
 - **timer.js**: Timer-specific logic and state management
 - **notifications.js**: Audio and browser notification handling
-- **websocket.js**: Real-time communication management
+- **socket.js**: Socket.IO client communication
 
 #### State Management
 - Local state for UI interactions
-- WebSocket state synchronization
+- Socket.IO event-driven state synchronization
 - LocalStorage for user preferences
 
 ### CSS Architecture
@@ -190,17 +201,17 @@ class PomodoroSession(BaseModel):
 
 ### Timer Operation Flow
 1. User initiates timer start
-2. Frontend sends start request to API
-3. Backend starts timer service
-4. Real-time updates sent via WebSocket
+2. Frontend sends start request to Flask API
+3. Backend starts timer service in background thread
+4. Real-time updates sent via Socket.IO events
 5. Frontend updates UI in real-time
 6. Session transitions trigger notifications
 
 ### State Synchronization
 1. Backend maintains authoritative timer state
-2. WebSocket broadcasts state changes
+2. Socket.IO broadcasts state changes to all clients
 3. Frontend updates local state and UI
-4. Offline resilience with local state backup
+4. Automatic reconnection handles network issues
 
 ## Key Features
 
@@ -228,13 +239,13 @@ class PomodoroSession(BaseModel):
 
 ### Phase 1: Foundation
 - [ ] Project structure setup
-- [ ] Basic FastAPI server
+- [ ] Basic Flask server
 - [ ] Simple HTML/CSS interface
 - [ ] Core timer functionality
 - [ ] Start/pause/reset controls
 
 ### Phase 2: Real-time Features
-- [ ] WebSocket implementation
+- [ ] Flask-SocketIO implementation
 - [ ] Live timer updates
 - [ ] Session type management
 - [ ] Basic notifications
@@ -301,15 +312,15 @@ This architecture is designed to maximize learning opportunities with GitHub Cop
 ## Security Considerations
 
 ### Backend Security
-- Input validation with Pydantic
+- Input validation with Flask-WTF or custom validators
 - CORS configuration for frontend access
 - Rate limiting for API endpoints
-- WebSocket connection authentication
+- Socket.IO authentication and session management
 
 ### Frontend Security
 - Content Security Policy headers
 - XSS prevention measures
-- Secure WebSocket connections (WSS)
+- Secure Socket.IO connections (HTTPS/WSS)
 
 ## Performance Optimization
 
