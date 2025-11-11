@@ -7,6 +7,7 @@ class Timer {
         this.currentState = null;
         this.displayInterval = null;
         this.elements = this.initializeElements();
+        this.visualEffects = null;
         this.setupEventListeners();
     }
 
@@ -47,6 +48,11 @@ class Timer {
         this.updateProgressIndicator();
         this.updateSessionInfo();
         this.updateControlButtons();
+        
+        // Initialize visual effects
+        if (window.VisualEffects) {
+            this.visualEffects = new VisualEffects();
+        }
     }
 
     /**
@@ -175,9 +181,33 @@ class Timer {
         
         this.elements.progressCircle.style.strokeDashoffset = strokeDashoffset;
         
-        // Update progress ring color for session type
-        const color = this.currentState.session_type === 'work' ? '#2563eb' : '#16a34a';
+        // Calculate dynamic color based on progress
+        let color;
+        if (this.currentState.session_type === 'break') {
+            // Keep green for breaks
+            color = '#16a34a';
+        } else if (this.visualEffects) {
+            // Use color transition for work sessions
+            color = this.visualEffects.getProgressColor(progressPercentage);
+            
+            // Update particle colors if effects are active
+            if (this.visualEffects.isEffectsActive()) {
+                this.visualEffects.updateParticleColors(progressPercentage);
+            }
+        } else {
+            // Fallback to basic color
+            color = '#2563eb';
+        }
+        
         this.elements.progressCircle.style.stroke = color;
+        
+        // Add running class for glow effect
+        const progressRing = document.querySelector('.progress-ring');
+        if (this.currentState.status === 'running') {
+            progressRing?.classList.add('running');
+        } else {
+            progressRing?.classList.remove('running');
+        }
     }
 
     /**
@@ -215,6 +245,24 @@ class Timer {
         // Enable/disable buttons based on state
         this.elements.resetBtn.disabled = false;
         this.elements.skipBtn.disabled = false;
+        
+        // Manage visual effects based on timer state
+        if (this.visualEffects) {
+            if (isRunning && this.currentState.session_type === 'work') {
+                // Start effects for work sessions
+                if (!this.visualEffects.isEffectsActive()) {
+                    this.visualEffects.start('work');
+                }
+            } else if (isRunning && this.currentState.session_type === 'break') {
+                // Start effects for break sessions
+                if (!this.visualEffects.isEffectsActive()) {
+                    this.visualEffects.start('break');
+                }
+            } else if (!isRunning) {
+                // Stop effects when paused or stopped
+                this.visualEffects.stop();
+            }
+        }
     }
 
     /**
