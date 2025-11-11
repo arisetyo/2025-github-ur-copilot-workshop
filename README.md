@@ -28,3 +28,26 @@ Activate `venv`:
 # activate venv
 source .venv/bin/activate
 ```
+
+## Running Unit Tests
+
+Unit tests are located in the `tests/` directory. To run all unit tests, make sure your virtual environment is activated:
+
+```bash
+source .venv/bin/activate
+pytest
+```
+
+To see a coverage report:
+
+```bash
+pytest --cov
+```
+
+You can also run a specific test file:
+
+```bash
+pytest tests/test_timer_service.py
+```
+
+All test files use `pytest` and cover the main logic in models, services, routes, and config.
