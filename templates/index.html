@@ -10,6 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Particle Effects Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Ripple Effects Container -->
+    <div class="ripple-container" id="ripple-container"></div>
+    
     <div class="container">
         <header>
             <h1 class="app-title">Pomodoro Timer</h1>
@@ -109,6 +115,7 @@
     <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
     
     <!-- Application Scripts -->
+    <script src="{{ url_for('static', filename='js/visual-effects.js') }}"></script>
     <script src="{{ url_for('static', filename='js/timer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
