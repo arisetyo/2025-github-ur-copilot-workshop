@@ -18,12 +18,11 @@ This repository contains **two versions** of the Pomodoro Timer app:
 - ✅ **Easy deploy**: Works on Heroku, Railway, Render, Docker, etc.
 - ✅ **All features**: Full Pomodoro functionality maintained
 
-👉 **[Read Simple Version Docs](README-simple.md)** | **[Deployment Guide](DEPLOYMENT.md)**
+👉 **[Quick Start Guide](QUICKSTART.md)** | **[Simple Version Docs](README-simple.md)** | **[Deployment Guide](DEPLOYMENT.md)**
 
 ```bash
-# Quick start with simple version
-pip install flask
-python simple_app.py
+# Get started in 1 minute!
+pip install flask && python simple_app.py
 ```
 
 ### 2. 🏗️ Full-Featured Version (Learning Architecture)

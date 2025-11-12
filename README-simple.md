@@ -38,11 +38,16 @@ pip install -r requirements-simple.txt
 # Activate virtual environment
 source .venv/bin/activate
 
-# Run the application
+# Run the application (production mode)
 python simple_app.py
+
+# Or enable debug mode for development
+FLASK_DEBUG=true python simple_app.py
 ```
 
 The application will be available at `http://localhost:5000`
+
+**Note:** Debug mode is disabled by default for security. Only enable it in development environments.
 
 ## Deployment
 
