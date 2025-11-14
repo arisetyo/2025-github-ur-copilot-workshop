@@ -81,16 +81,7 @@ sequenceDiagram
 ---
 
 ## Key Features
-- 25-minute work sessions, 5-minute breaks, 15-minute long breaks
-- Real-time timer synchronization
-- Audio and browser notifications
-- Responsive design for mobile and desktop
-- Customizable session durations and themes
-- Session statistics tracking
-
----
-
-## For Developers
+ - Enhanced Visual Feedback: The application now provides improved visual cues and effects during timer transitions, session completions, and notifications. This includes dynamic animations, color changes, and more engaging feedback to help users track their progress and stay motivated.
 - Modular codebase: `models/`, `routes/`, `services/`, `static/`, `templates/`
 - RESTful API and Socket.IO for real-time features
 - Unit tests for backend logic and API endpoints
